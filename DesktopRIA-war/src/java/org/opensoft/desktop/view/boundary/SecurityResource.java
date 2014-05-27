@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.opensoft.desktop.view.boundary;
+package org.opensoft.desktop.view.boundary; 
 
 import com.sun.xml.rpc.processor.modeler.j2ee.xml.javaIdentifierType;
 import java.io.IOException;
