@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Desktop app</title>
+</head>
+
+<body>
+    
+    <div id="loading-mask"></div>
+    <div id="loading">
+	<img src="images/loading.gif" width="120" height="120" alt="Cargando..." />
+	<p id="msg">Por favor espere: Cargando estilos...</p>
+    </div>
+    
+    <link rel="stylesheet" type="text/css" href="css/desktop.css" />
+    <link rel="stylesheet" href="css/loading.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript">document.getElementById('msg').innerHTML = 'Por favor espere: Cargando archivos ExtJS';</script> 
+    
+    <script type="text/javascript" src="../../pages/shared/include-ext.js"></script>
+    
+    <!--script type="text/javascript" src="../../pages/shared/options-toolbar.js"></script-->
+    
+    <script type="text/javascript" src="../../pages/locale/ext-lang-es.js"></script>
+    
+    
+    <script type="text/javascript">document.getElementById('msg').innerHTML = 'Por favor espere: Cargando Desktop RIA.';</script> 
+    
+
+<!--
+    <a href="http://www.sencha.com" target="_blank" alt="Powered by Ext JS"
+       id="poweredby"><div></div></a>
+-->
+
+
+<script type="text/javascript">
+        
+        
+            
+            Ext.Loader.setPath({
+            'Ext.ux.desktop': 'js',
+            MyDesktop: ''
+            });
+
+            Ext.define("MyDesktop.global.Initial", {
+                constructor: function() {
+                    console.log("iniciando variables globales");
+                    //console.log("Global.Initial.DESKTOP_LOGIN_URL - " + this.LOGIN_URL);
+                    //global
+                    
+                    var init = this;
+                    
+                    Ext.Ajax.request({
+                        //method : 'POST',
+                        url: this.SECURITY + "/global/",
+                        //url: './../../recursos/security/global/',
+                        //params: {operation: 'global'},
+                        //params: {usuario: 'administrador',clave : '39f81e6097cf3cceb5fd83be055cac4f20bb0e0ce366980ea0d3779353e18b7c'},
+                        success: function(response, opts) {
+                            console.log("retorna respuesta  -> " + response);
+                            var jsonData = Ext.decode(response.responseText);
+                            console.log("jsonData  -> " + jsonData);
+                            console.log("jsonData.success  -> " + jsonData.success);
+                            console.log("jsonData.connected  -> " + jsonData.connected);
+                            console.log("jsonData.user  -> " + jsonData.usuario);
+                            if (jsonData.connected !== undefined) {
+                                Global.connected = jsonData.connected;
+                                if (!Global.connected) {
+                                    setTimeout(function(){
+					init.hideLoadingMessage();
+                                        //activo el login - inicio
+                                        Ext.require("MyDesktop.security.LoginWindow", function() {
+                                        var win = Ext.create("MyDesktop.security.LoginWindow", {
+                                            //modal: true
+                                        });
+                                        win.show();
+                                        //activo el login - fin
+                                        
+                                    });
+                                        
+                                    }, Global.LOADING_TIME_OUT );
+                                   
+                                } else {
+                                   Global.user = jsonData.usuario;
+                                   init.startDesktop();
+                                }
+                            }
+
+                        },
+                        failure: function(response, opts) {
+                            var status = response.status;
+                            var statusText = response.statusText;
+                            Ext.Msg.alert('Código ' + status, statusText);
+                        }
+                    });
+                    
+                },
+                alternateClassName : "Global",
+                alias : "global",
+                singleton : true,
+                connected : false,
+                user : undefined,
+                //LOGIN: "./../../ServletTest",
+                //SECURITY : "./../../recursos/security",
+                SECURITY : contextPath + "/recursos/security",
+                HOME_PAGE : contextPath + "/pages/desktop/desktop.html",
+                LOADING_TIME_OUT : 500,
+                hideLoadingMessage : function (){
+                    
+                    var load = Ext.get("loading");
+                    
+                    if(load !== null){
+                        Ext.get("loading").remove();
+                        Ext.get("loading-mask").fadeOut({remove:true}); 
+                    }else{
+                        console.log("no entro a eliminar, estaba null");
+                    }
+                    
+                    
+                },
+                startDesktop: function() {
+                    
+                    Ext.Loader.loadScript( "../../pages/shared/options-toolbar.js" );
+                    
+                    console.log("desktop - startDesktop");
+                    
+                    Ext.require('MyDesktop.App');
+                    var myDesktopApp;
+                    
+                    var init = this;
+                    
+                    Ext.onReady(function () {
+
+                                            setTimeout(function(){
+                                                    init.hideLoadingMessage();
+                                                    
+                                                    myDesktopApp = new MyDesktop.App();
+                                            }, 
+                                            Global.LOADING_TIME_OUT );
+
+
+                    });
+                }
+                        
+            });
+            
+
+
+    
+            
+    
+        
+    </script>
+
+</body>
+</html>
