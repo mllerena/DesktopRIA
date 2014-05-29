@@ -13,6 +13,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,10 +24,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlAccessorOrder;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.opensoft.desktop.model.enums.StatusType;
 
 /**
  *
@@ -44,7 +51,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Usuarios.findByFechaIngreso", query = "SELECT u FROM Usuarios u WHERE u.fechaIngreso = :fechaIngreso"),
     @NamedQuery(name = "Usuarios.findByFechaModificacion", query = "SELECT u FROM Usuarios u WHERE u.fechaModificacion = :fechaModificacion"),
     @NamedQuery(name = "Usuarios.findByEstado", query = "SELECT u FROM Usuarios u WHERE u.estado = :estado"),
-    @NamedQuery(name = "Usuarios.findByUsuarioAndClave", query = "SELECT u FROM Usuarios u WHERE u.usuario = :usuario and u.clave = :clave and u.estado = 'A'")
+    @NamedQuery(name = "Usuarios.findByUsuarioAndClave", query = "SELECT u FROM Usuarios u WHERE u.usuario = :usuario and u.clave = :clave and u.estado = org.opensoft.desktop.model.enums.StatusType.ACTIVO ")
 }
 )
 public class Usuarios implements Serializable {
@@ -84,11 +91,26 @@ public class Usuarios implements Serializable {
     @Column(name = "FECHA_MODIFICACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
+    
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 1)
     @Column(name = "ESTADO")
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private StatusType estado;
+    
+    @Transient
+    private String descEstado;
+
+    public String getDescEstado() {
+        return descEstado;
+    }
+
+    public void setDescEstado(String descEstado) {
+        this.descEstado = descEstado;
+    }
+    
+    
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuarios1")
     private List<Perfiles> perfilesList;
 
@@ -99,7 +121,7 @@ public class Usuarios implements Serializable {
         this.codigo = codigo;
     }
 
-    public Usuarios(Long codigo, String usuario, String clave, String usuarioIngreso, String usuarioModificacion, Date fechaIngreso, Date fechaModificacion, String estado) {
+    public Usuarios(Long codigo, String usuario, String clave, String usuarioIngreso, String usuarioModificacion, Date fechaIngreso, Date fechaModificacion, StatusType estado) {
         this.codigo = codigo;
         this.usuario = usuario;
         this.clave = clave;
@@ -109,6 +131,8 @@ public class Usuarios implements Serializable {
         this.fechaModificacion = fechaModificacion;
         this.estado = estado;
     }
+    
+    
 
     public Long getCodigo() {
         return codigo;
@@ -166,13 +190,15 @@ public class Usuarios implements Serializable {
         this.fechaModificacion = fechaModificacion;
     }
 
-    public String getEstado() {
+    
+    public StatusType getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(StatusType estado) {
         this.estado = estado;
     }
+    
 
     @XmlTransient
     public List<Perfiles> getPerfilesList() {
