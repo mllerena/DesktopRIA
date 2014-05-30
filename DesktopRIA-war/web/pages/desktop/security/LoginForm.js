@@ -2,10 +2,8 @@ Ext.define("MyDesktop.security.LoginForm", {
     extend: "Ext.form.Panel",
     alias: "loginform",
     id: 'status-form',
-    forward: true,
     defaults: {
         allowBlank: false,
-        selectOnFocus: true,
         msgTarget: 'side'
     },
     initComponent: function() {
@@ -46,18 +44,21 @@ Ext.define("MyDesktop.security.LoginForm", {
         ];
     },
     createLoginFields: function() {
-        return [{
+        return [
+            {
+                id: 'field-usuario',
                 xtype: 'textfield',
                 fieldLabel: "Usuario",
+                emptyText: "Usuario",
                 name: "username",
-                allowBlank: false,
                 blankText: 'Usuario es requerido'
-            }, {
+            }, 
+            {
                 xtype: 'textfield',
                 inputType: 'password',
                 fieldLabel: 'Contraseña',
+                emptyText: "Contraseña",
                 name: 'password',
-                allowBlank: false,
                 blankText: 'Contraseña es requerida',
                 listeners: {
                     scope: this,
@@ -67,7 +68,8 @@ Ext.define("MyDesktop.security.LoginForm", {
                         }
                     }
                 }
-            }];
+            }
+        ];
     },
     login: function() {
         var me = this;
@@ -116,17 +118,7 @@ Ext.define("MyDesktop.security.LoginForm", {
         }
     },
     startDesktop: function() {
-        
         console.log("start desktop - login form");
-        
         Global.startDesktop();
-        
-        /*
-        Ext.require('MyDesktop.App');
-        var myDesktopApp;
-        Ext.onReady(function() {
-            myDesktopApp = new MyDesktop.App();
-        });
-        */
     }
 });

@@ -74,6 +74,9 @@
                                             //modal: true
                                         });
                                         win.show();
+                                        
+                                        Ext.getCmp('field-usuario').focus();
+                                        
                                         //activo el login - fin
                                         
                                     });
@@ -134,6 +137,48 @@
                                             setTimeout(function(){
                                                     init.hideLoadingMessage();
                                                     
+                                                    //Definiendo model globales
+                                                    Ext.define('Personas', {
+                                                        extend: 'Ext.data.Model',
+                                                        fields: [
+                                                            { name: 'codigo', type: 'int'},
+                                                            { name: 'primerNombre', type: 'string' },
+                                                            { name: 'segundoNombre', type: 'string' },
+                                                            { name: 'primerApellido', type: 'string' },
+                                                            { name: 'segundoApellido', type: 'string' },
+                                                            { name: 'identificacion', type: 'string' },
+                                                            { name: 'usuarioIngreso' },
+                                                            { name: 'usuarioModificacion' },
+                                                            { name: 'fechaIngreso', type: 'date' },
+                                                            { name: 'fechaModificacion', type: 'date' },
+                                                            { name: 'estado' }
+                                                        ]
+                                                    });
+                                                    
+                                                    Ext.define('Usuarios', {
+                                                        extend: 'Ext.data.Model',
+                                                        fields: [
+                                                            { name: 'codigo', type: 'int' },
+                                                            { name: 'usuario' },
+                                                            { name: 'clave' },
+                                                            //{ name: 'persona'},
+                                                            { name: 'usuarioIngreso' },
+                                                            { name: 'usuarioModificacion' },
+                                                            { name: 'fechaIngreso', type: 'date' },
+                                                            { name: 'fechaModificacion', type: 'date' },
+                                                            { name: 'estado' }
+                                                        ],
+                                                        // we can use the hasOne shortcut on the model to create a hasOne association foreignKey : 'persona', primaryKey : 'codigo'
+                                                        associations: [ { type: 'hasOne', model: 'Personas', associationKey : 'persona' } ]
+                                                        
+                                                        //hasOne : 'Personas'
+                                                        
+                                                    });
+
+            
+            
+                                                    
+                                                    
                                                     myDesktopApp = new MyDesktop.App();
                                             }, 
                                             Global.LOADING_TIME_OUT );
@@ -154,3 +199,4 @@
 
 </body>
 </html>
+

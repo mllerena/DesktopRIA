@@ -16,7 +16,7 @@ Ext.define("MyDesktop.security.LoginWindow", {
     width: 300,
 //    height: 200,
     closable: false,
-    forward: true,
+    //forward: true,
     initComponent: function() {
         this.items = this.buildItems();
         this.callParent();
@@ -25,7 +25,7 @@ Ext.define("MyDesktop.security.LoginWindow", {
         return [{
                 xtype: "component"
             },
-            Ext.create("MyDesktop.security.LoginForm", {forward: this.forward})
+            Ext.create("MyDesktop.security.LoginForm", {} )
         ]; 
     }
 });
