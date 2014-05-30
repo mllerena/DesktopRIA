@@ -18,18 +18,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlAccessorOrder;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.opensoft.desktop.model.enums.StatusType;
@@ -71,6 +69,11 @@ public class Usuarios implements Serializable {
     @Size(min = 1, max = 512)
     @Column(name = "CLAVE")
     private String clave;
+    
+    @JoinColumn(name = "PERSONA", referencedColumnName = "CODIGO")
+    @ManyToOne
+    private Personas persona;
+	
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
@@ -97,19 +100,6 @@ public class Usuarios implements Serializable {
     @Column(name = "ESTADO")
     @Enumerated(EnumType.STRING)
     private StatusType estado;
-    
-    @Transient
-    private String descEstado;
-
-    public String getDescEstado() {
-        return descEstado;
-    }
-
-    public void setDescEstado(String descEstado) {
-        this.descEstado = descEstado;
-    }
-    
-    
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuarios1")
     private List<Perfiles> perfilesList;
@@ -156,6 +146,14 @@ public class Usuarios implements Serializable {
 
     public void setClave(String clave) {
         this.clave = clave;
+    }
+    
+    public Personas getPersona() {
+        return persona;
+    }
+
+    public void setPersona(Personas persona) {
+        this.persona = persona;
     }
 
     public String getUsuarioIngreso() {
@@ -208,7 +206,7 @@ public class Usuarios implements Serializable {
     public void setPerfilesList(List<Perfiles> perfilesList) {
         this.perfilesList = perfilesList;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;
