@@ -108,6 +108,7 @@
                 SECURITY : contextPath + "/recursos/security",
                 HOME_PAGE : contextPath + "/pages/desktop/desktop.html",
                 LOADING_TIME_OUT : 500,
+                STATUS_LIST : undefined,
                 hideLoadingMessage : function (){
                     
                     var load = Ext.get("loading");
@@ -139,9 +140,11 @@
                                                     
                                                     //Definiendo model globales
                                                     Ext.define('Personas', {
+                                                        idProperty : 'codigo',
                                                         extend: 'Ext.data.Model',
                                                         fields: [
-                                                            { name: 'codigo', type: 'int'},
+                                                            //{ name: 'id', type: 'int', mapping : 'codigo' },
+                                                            { name: 'codigo', type: 'int' },
                                                             { name: 'primerNombre', type: 'string' },
                                                             { name: 'segundoNombre', type: 'string' },
                                                             { name: 'primerApellido', type: 'string' },
@@ -153,15 +156,40 @@
                                                             { name: 'fechaModificacion', type: 'date' },
                                                             { name: 'estado' }
                                                         ]
+                                                        ,belongsTo : 'Usuarios',
+                                                        proxy: {
+                                                            type: 'ajax',
+                                                            //url: Global.SECURITY + "/users/",
+                                                            api: {
+                                                                create  : '/controller/new',
+                                                                read    : Global.SECURITY + "/personas/read",
+                                                                update  : Global.SECURITY + "/personas/update",
+                                                                destroy : '/controller/destroy_action'
+                                                            },
+                                                            reader: {
+                                                                type: 'json',
+                                                                //root: 'images',
+                                                                idProperty: 'codigo'
+                                                            },
+                                                            writer: {
+                                                                type: 'json'
+                                                                //,writeAllFields : true
+                                                                //encode : true,
+                                                                //root : 'root'
+                                                            }
+                                                        }
                                                     });
                                                     
                                                     Ext.define('Usuarios', {
+                                                        idProperty : 'codigo',
                                                         extend: 'Ext.data.Model',
                                                         fields: [
                                                             { name: 'codigo', type: 'int' },
+                                                            //{ name: 'id', type: 'int', mapping : 'codigo' },
                                                             { name: 'usuario' },
                                                             { name: 'clave' },
-                                                            //{ name: 'persona'},
+                                                            //{ name: 'personas_id', mapping : 'persona',type: 'int' },
+                                                            //{ name: 'personas_id', mapping : 'persona' },
                                                             { name: 'usuarioIngreso' },
                                                             { name: 'usuarioModificacion' },
                                                             { name: 'fechaIngreso', type: 'date' },
@@ -169,10 +197,89 @@
                                                             { name: 'estado' }
                                                         ],
                                                         // we can use the hasOne shortcut on the model to create a hasOne association foreignKey : 'persona', primaryKey : 'codigo'
-                                                        associations: [ { type: 'hasOne', model: 'Personas', associationKey : 'persona' } ]
+                                                        //associations: [ { type: 'hasOne', model: 'Personas', associationKey : 'persona' } ]
+                                                        
+                                                        associations: [ { type: 'hasOne', model: 'Personas', associationKey : 'persona', primaryKey : 'codigo' , foreignKey : 'persona'} ]
                                                         
                                                         //hasOne : 'Personas'
+                                                        ,proxy: {
+                                                            type: 'ajax',
+                                                            //url: Global.SECURITY + "/users/",
+                                                            api: {
+                                                                create  : '/controller/new',
+                                                                read    : Global.SECURITY + "/users/read",
+                                                                update  : Global.SECURITY + "/users/update",
+                                                                destroy : '/controller/destroy_action'
+                                                            },
+                                                            reader: {
+                                                                type: 'json',
+                                                                //root: 'images',
+                                                                idProperty: 'codigo'
+                                                            },
+                                                            writer : {
+                                                                type: 'json'
+                                                                //,writeAllFields : true
+                                                                //encode : true,
+                                                                //root : 'root'
+                                                            },
+                                                            listeners: {
+                                                                exception : function ( proxy , response, operation, eOpts ){
+                                                                     var status = response.status;
+                                                                     var statusText = response.statusText;
+                                                                     Ext.Msg.alert('Código ' + status, statusText);
+                                                                }
+
+                                                            }
+                                                        }
                                                         
+                                                    });
+                                                    
+                                                    Global.STATUS_LIST = Ext.create('Ext.data.Store', {
+                                                        fields: ['codigo', 'estado'],
+                                                        data : [
+                                                            {"codigo":"A", "estado":"ACTIVO"},
+                                                            {"codigo":"I", "estado":"INACTIVO"}
+                                                        ]
+                                                    });
+                                                    
+                                                    
+                                                    Ext.apply(Ext.form.field.VTypes, {
+                                                        daterange: function(val, field) {
+                                                            var date = field.parseDate(val);
+
+                                                            if (!date) {
+                                                                return false;
+                                                            }
+                                                            if (field.startDateField && (!this.dateRangeMax || (date.getTime() != this.dateRangeMax.getTime()))) {
+                                                                var start = field.up('form').down('#' + field.startDateField);
+                                                                start.setMaxValue(date);
+                                                                start.validate();
+                                                                this.dateRangeMax = date;
+                                                            }
+                                                            else if (field.endDateField && (!this.dateRangeMin || (date.getTime() != this.dateRangeMin.getTime()))) {
+                                                                var end = field.up('form').down('#' + field.endDateField);
+                                                                end.setMinValue(date);
+                                                                end.validate();
+                                                                this.dateRangeMin = date;
+                                                            }
+                                                            /*
+                                                             * Always return true since we're only using this vtype to set the
+                                                             * min/max allowed values (these are tested for after the vtype test)
+                                                             */
+                                                            return true;
+                                                        },
+
+                                                        daterangeText: 'Start date must be less than end date',
+
+                                                        password: function(val, field) {
+                                                            if (field.initialPassField) {
+                                                                var pwd = field.up('form').down('#' + field.initialPassField);
+                                                                return (val == pwd.getValue());
+                                                            }
+                                                            return true;
+                                                        },
+
+                                                        passwordText: 'La clave no coincide'
                                                     });
 
             

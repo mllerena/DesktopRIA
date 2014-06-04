@@ -6,38 +6,15 @@
 
 package org.opensoft.desktop.view.boundary; 
 
-import com.sun.xml.rpc.processor.modeler.j2ee.xml.javaIdentifierType;
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
-import javax.ejb.Stateless;
 import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
 import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
-import javax.persistence.Entity;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -48,7 +25,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.codehaus.jackson.map.ObjectMapper;
+import javax.xml.bind.JAXBElement;
+import org.opensoft.desktop.model.entities.Personas;
 import org.opensoft.desktop.model.entities.Usuarios;
 import org.opensoft.desktop.model.exceptions.NotFoundException;
 import org.opensoft.desktop.model.services.UsuariosFacade;
@@ -148,14 +126,37 @@ public class SecurityResource implements Serializable{
     } 
     
     
+    
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("users/")
-    public List<Usuarios> users( ){
+    @Path("users/read")
+    public List<Usuarios> usersRead( ){
         
         System.out.println("lista usuarios obtener");
         
         return uf.findAll();
+    }
+    
+    @POST
+    @Path("users/update")
+    public Response updateUsuario(JAXBElement<Usuarios> xmlUsuario ){
+        System.out.println("updateUsuario: "+xmlUsuario.getValue());
+        System.out.println("getUsuario: "+xmlUsuario.getValue().getUsuario());
+        System.out.println("getClave: "+xmlUsuario.getValue().getClave());
+        return Response.ok( ).build();
+        
+    } 
+    
+    
+    @POST
+    @Path("personas/update")
+    public Response updatePersona(JAXBElement<Personas> xmlPersona ){
+        System.out.println("updatePersona - "+xmlPersona.getValue());
+        System.out.println("getPrimerNombre - "+xmlPersona.getValue().getPrimerNombre());
+        System.out.println("getPrimerApellido - "+xmlPersona.getValue().getPrimerApellido());
+        return Response.ok( ).build();
+        
     } 
     
 

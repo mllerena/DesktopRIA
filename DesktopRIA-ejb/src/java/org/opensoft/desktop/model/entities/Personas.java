@@ -12,6 +12,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.opensoft.desktop.model.enums.StatusType;
 
 /**
  *
@@ -119,11 +122,13 @@ public class Personas implements Serializable {
     @Column(name = "FECHA_MODIFICACION")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
+    
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 1)
     @Column(name = "ESTADO")
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    private StatusType estado;
+    
     @OneToMany(mappedBy = "persona")
     private List<Usuarios> usuariosList;
 
@@ -134,7 +139,7 @@ public class Personas implements Serializable {
         this.codigo = codigo;
     }
 
-    public Personas(Long codigo, String primerNombre, String primerApellido, String tipoPersona, String usuarioIngreso, String usuarioModificacion, Date fechaIngreso, Date fechaModificacion, String estado) {
+    public Personas(Long codigo, String primerNombre, String primerApellido, String tipoPersona, String usuarioIngreso, String usuarioModificacion, Date fechaIngreso, Date fechaModificacion, StatusType estado) {
         this.codigo = codigo;
         this.primerNombre = primerNombre;
         this.primerApellido = primerApellido;
@@ -274,13 +279,15 @@ public class Personas implements Serializable {
         this.fechaModificacion = fechaModificacion;
     }
 
-    public String getEstado() {
+    public StatusType getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(StatusType estado) {
         this.estado = estado;
     }
+
+    
 
     @XmlTransient
     public List<Usuarios> getUsuariosList() {

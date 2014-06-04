@@ -53,31 +53,18 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                         title: 'Listado de usuarios',
                         width: 450,
                         height: 185,
+                        id : 'grid-lista-usuario',
                         //autoScroll : true,
-                        store: new Ext.data.ArrayStore({
+                        store: new Ext.data.Store({
                             autoLoad : true,
                             model : 'Usuarios',
-                            /*
-                            fields: [
-                               { name: 'codigo' },
-                               { name: 'usuario' },
-                               { name: 'clave' },
-                               { name: 'persona' },
-                               { name: 'usuarioIngreso' },
-                               { name: 'usuarioModificacion' },
-                               { name: 'fechaIngreso', type: 'date' },
-                               { name: 'fechaModificacion', type: 'date' },
-                               { name: 'estado' }
-                            ],
-                            */
-                            proxy: {
-                                type: 'ajax',
-                                url: Global.SECURITY + "/users/",
-                                reader: {
-                                    type: 'json',
-                                    //root: 'images',
-                                    idProperty: 'codigo'
-                                }
+                            listeners: {
+                                    datachanged : function (store, eOpts){
+                                        console.log("datachanged event");
+                                    },
+                                    update : function ( store, record, operation, eOpts ){
+                                        console.log("update event");
+                                    }
                             }
                         }),
                         columns: [
@@ -87,6 +74,7 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                 width: 80,
                                 sortable: true,
                                 dataIndex: 'codigo'
+                                //dataIndex: 'id'
                             },
                             {
                                 text: "Usuario",
@@ -132,23 +120,30 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                         listeners: {
                             selectionchange: function(model, records) {
                                 if (records[0]) {
+                                    
                                     console.log("selectionchange - "+records[0]);
+                                    
+                                    if(Ext.getCmp('admin-user-codigo').isHidden( )){
+                                       Ext.getCmp('admin-user-codigo').show(); 
+                                    }
+                                        
+                                    
                                     var recordUsuario = records[0];
                                     Ext.getCmp('form-det-cuenta').loadRecord(recordUsuario);
+                                    Ext.getCmp('confirmPass').setValue(recordUsuario.get('clave'));
+                                    
+                                    
+                                    
+                                    //debugger;
                                     
                                     if(records[0].hasOwnProperty("PersonasHasOneInstance") ){
+                                        //var recordPersona = Ext.create('Personas', associatedDataRecords.Personas );
                                         var recordPersona = records[0].getPersonas( );
                                         Ext.getCmp('form-dat-personales').loadRecord(recordPersona);
                                     }else{
                                         Ext.getCmp('form-dat-personales').getForm().reset();
                                     }
                                     
-                                    //
-                                    
-                                    
-                                    //console.log("persona - "+persona);
-                                    
-                                    //if(recordPersona)Ext.getCmp('form-dat-personales').loadRecord(recordPersona);
                                     
                                     
                                 }
@@ -164,6 +159,43 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                             bodyPadding: 10,
                             layout: 'anchor'
                         },
+                        dockedItems: [{
+                            xtype: 'toolbar',
+                            dock: 'top',
+                            items: [
+                                { 
+                                    xtype: 'button', 
+                                    text: 'Grabar',
+                                    handler: function() {
+                                            var formDetCuenta = Ext.getCmp('form-det-cuenta').getForm();
+                                            
+                                            var formDatPersonales = Ext.getCmp('form-dat-personales').getForm();
+                                            
+                                            
+                                            if (formDetCuenta.isValid() && formDatPersonales.isValid()) {
+                                                
+                                                formDetCuenta.updateRecord();
+                                                formDatPersonales.updateRecord();
+                                                
+                                                
+                                                formDetCuenta.getRecord( ).save();
+                                                
+                                                formDatPersonales.getRecord( ).save();
+                                                
+                                            }
+                                    }
+                                },
+                                { 
+                                    xtype: 'button', 
+                                    text: 'Nuevo',
+                                    handler: function() {
+                                        Ext.getCmp('form-det-cuenta').getForm().reset();
+                                        Ext.getCmp('admin-user-codigo').hide();
+                                        Ext.getCmp('admin-user-usuario').focus();
+                                    }
+                                }
+                            ]
+                        }],        
                         items:[
                             {
                                 //region: 'center',
@@ -181,7 +213,8 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                 defaults: {
                                     //anchor: '100%'
                                     width: 240,
-                                    labelWidth: 90
+                                    labelWidth: 90,
+                                    msgTarget: 'side'
                                 },
 
                                 // The fields
@@ -189,43 +222,60 @@ Ext.define('MyDesktop.users.ManagementUsers', {
 
                                 items: [
                                     {
+                                        id : 'admin-user-codigo',
                                         fieldLabel: 'Código',
                                         name: 'codigo',
+                                        //name: 'id',
                                         readOnly : true
                                     },
                                     {
+                                        id : 'admin-user-usuario',
                                         fieldLabel: 'Usuario',
                                         name: 'usuario'
                                     },
                                     {
-                                        xtype: 'datefield',
-                                        fieldLabel: 'Fecha Ingreso',
-                                        name: 'fechaIngreso',
-                                        renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+                                        itemId: 'pass',
+                                        fieldLabel: 'Contraseña',
+                                        name: 'clave',
+                                        inputType : 'password',
+                                        listeners: {
+                                            validitychange: function(field){
+                                                field.next().validate();
+                                            },
+                                            blur: function(field){
+                                                field.next().validate();
+                                            }
+                                        }
                                     },
                                     {
-                                        xtype: 'datefield',
-                                        fieldLabel: 'Fecha Modificación',
-                                        name: 'fechaModificacion',
-                                        renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+                                        id: 'confirmPass',
+                                        fieldLabel: 'Confirmar Contraseña',
+                                        name: 'confirmClave',
+                                        inputType : 'password',
+                                        vtype: 'password',
+                                        initialPassField: 'pass'
                                     },
                                     {
+                                        xtype : 'combobox',
                                         fieldLabel: 'Estado',
                                         name: 'estado',
-                                        readOnly : true
+                                        store: Global.STATUS_LIST,
+                                        queryMode: 'local',
+                                        valueField: 'estado',
+                                        displayField: 'estado'
                                     }
                                 ]
 
                                 // Reset and Submit buttons
-                                /*
+                                /*,
                                 buttons: [
                                     {
-                                        text: 'Reset',
+                                        text: 'Nuevo',
                                         handler: function() {
                                             this.up('form').getForm().reset();
                                         }
                                     }, {
-                                        text: 'Submit',
+                                        text: 'Grabar',
                                         formBind: true, //only enabled once the form is valid
                                         disabled: true,
                                         handler: function() {
@@ -242,8 +292,10 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                             }
                                         }
                                     }
-                                ]
-                                */
+                                ]*/
+                                
+                                
+                                
                             },
                             {
                                 id : 'form-dat-personales',
@@ -260,7 +312,8 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                 defaults: {
                                     //anchor: '100%'
                                     width: 240,
-                                    labelWidth: 90
+                                    labelWidth: 90,
+                                    msgTarget: 'side'
                                 },
 
                                 // The fields
@@ -268,25 +321,49 @@ Ext.define('MyDesktop.users.ManagementUsers', {
 
                                 items: [
                                     {
-                                        fieldLabel: 'Nombre',
+                                        fieldLabel: 'Primer nombre',
                                         name : 'primerNombre'
                                     },
                                     {
-                                        xtype: 'datefield',
-                                        fieldLabel: 'Fecha Ingreso',
-                                        name: 'fechaIngreso',
-                                        renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+                                        fieldLabel: 'Segundo nombre',
+                                        name : 'segundoNombre'
                                     },
                                     {
-                                        xtype: 'datefield',
-                                        fieldLabel: 'Fecha Modificación',
-                                        name: 'fechaModificacion',
-                                        renderer: Ext.util.Format.dateRenderer('Y-m-d H:i:s')
+                                        fieldLabel: 'Primer apellido',
+                                        name : 'primerApellido'
                                     },
                                     {
+                                        fieldLabel: 'Segundo apellido',
+                                        name : 'segundoApellido'
+                                    },
+                                    {
+                                        fieldLabel: 'Identificación',
+                                        name : 'identificacion'
+                                    },
+                                    
+                                    /*
+                                    
+                                    {
+                                        fieldLabel: 'Dirección',
+                                        name : 'primerNombre'
+                                    },
+                                    {
+                                        fieldLabel: 'Parroquia',
+                                        name : 'primerNombre'
+                                    },
+                                    {
+                                        fieldLabel: 'Teléfono',
+                                        name : 'primerNombre'
+                                    },
+                                    */
+                                    {
+                                        xtype : 'combobox',
                                         fieldLabel: 'Estado',
                                         name: 'estado',
-                                        readOnly : true
+                                        store: Global.STATUS_LIST,
+                                        queryMode: 'local',
+                                        valueField: 'estado',
+                                        displayField: 'estado'
                                     }
                                 ]
 
