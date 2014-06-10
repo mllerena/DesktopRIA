@@ -105,10 +105,6 @@ public class SecurityResource implements Serializable{
         
     } 
     
-    //private @Context ServletContext context;
-                            //private @Context HttpServletResponse response;
-    
-    
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("logout/")
@@ -126,35 +122,58 @@ public class SecurityResource implements Serializable{
     } 
     
     
-    
+    @POST
+    @Path("usuarios/create")
+    public Response createUsuario(JAXBElement<Usuarios> usuario ){
+        System.out.println("createUsuario: "+usuario.getValue());
+        System.out.println("getUsuario: "+usuario.getValue().getUsuario());
+        System.out.println("getClave: "+usuario.getValue().getClave());
+        Usuarios u = usuario.getValue();
+        uf.create(u);
+        return Response.ok( ).build();
+    }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("users/read")
-    public List<Usuarios> usersRead( ){
-        
-        System.out.println("lista usuarios obtener");
-        
+    @Path("usuarios/read")
+    public List<Usuarios> findAllUsuarios( ){
         return uf.findAll();
     }
     
     @POST
-    @Path("users/update")
-    public Response updateUsuario(JAXBElement<Usuarios> xmlUsuario ){
-        System.out.println("updateUsuario: "+xmlUsuario.getValue());
-        System.out.println("getUsuario: "+xmlUsuario.getValue().getUsuario());
-        System.out.println("getClave: "+xmlUsuario.getValue().getClave());
-        return Response.ok( ).build();
+    @Path("usuarios/update")
+    public Response updateUsuario(JAXBElement<Usuarios> usuario ){
+        System.out.println("updateUsuario: "+usuario.getValue());
+        System.out.println("getUsuario: "+usuario.getValue().getUsuario());
+        System.out.println("getClave: "+usuario.getValue().getClave());
+        System.out.println("getPersona: "+usuario.getValue().getPersona() );
+        Usuarios u = usuario.getValue();
+        uf.edit(u);
         
+        return Response.ok( ).build();
     } 
+    
+    @POST
+    @Path("usuarios/remove")
+    public Response removeUsuario(JAXBElement<Usuarios> usuario ){
+        System.out.println("removeUsuario: "+usuario.getValue());
+        System.out.println("getUsuario: "+usuario.getValue().getUsuario());
+        System.out.println("getClave: "+usuario.getValue().getClave());
+        System.out.println("getPersona: "+usuario.getValue().getPersona() );
+        Usuarios u = usuario.getValue();
+        uf.remove(u);
+        return Response.ok( ).build();
+    } 
+    
+    
     
     
     @POST
     @Path("personas/update")
-    public Response updatePersona(JAXBElement<Personas> xmlPersona ){
-        System.out.println("updatePersona - "+xmlPersona.getValue());
-        System.out.println("getPrimerNombre - "+xmlPersona.getValue().getPrimerNombre());
-        System.out.println("getPrimerApellido - "+xmlPersona.getValue().getPrimerApellido());
+    public Response updatePersona(JAXBElement<Personas> persona ){
+        System.out.println("updatePersona - "+persona.getValue());
+        System.out.println("getPrimerNombre - "+persona.getValue().getPrimerNombre());
+        System.out.println("getPrimerApellido - "+persona.getValue().getPrimerApellido());
         return Response.ok( ).build();
         
     } 

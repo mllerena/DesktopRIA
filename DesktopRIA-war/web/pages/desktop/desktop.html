@@ -173,7 +173,7 @@
                                                             },
                                                             writer: {
                                                                 type: 'json'
-                                                                //,writeAllFields : true
+                                                                //,writeAllFields : false
                                                                 //encode : true,
                                                                 //root : 'root'
                                                             }
@@ -189,7 +189,7 @@
                                                             { name: 'usuario' },
                                                             { name: 'clave' },
                                                             //{ name: 'personas_id', mapping : 'persona',type: 'int' },
-                                                            //{ name: 'personas_id', mapping : 'persona' },
+                                                            { name: 'persona'},
                                                             { name: 'usuarioIngreso' },
                                                             { name: 'usuarioModificacion' },
                                                             { name: 'fechaIngreso', type: 'date' },
@@ -206,10 +206,10 @@
                                                             type: 'ajax',
                                                             //url: Global.SECURITY + "/users/",
                                                             api: {
-                                                                create  : '/controller/new',
-                                                                read    : Global.SECURITY + "/users/read",
-                                                                update  : Global.SECURITY + "/users/update",
-                                                                destroy : '/controller/destroy_action'
+                                                                create  : Global.SECURITY + '/usuarios/create',
+                                                                read    : Global.SECURITY + "/usuarios/read",
+                                                                update  : Global.SECURITY + "/usuarios/update",
+                                                                destroy : Global.SECURITY + '/usuarios/destroy'
                                                             },
                                                             reader: {
                                                                 type: 'json',
@@ -218,7 +218,7 @@
                                                             },
                                                             writer : {
                                                                 type: 'json'
-                                                                //,writeAllFields : true
+                                                                //,writeAllFields : false
                                                                 //encode : true,
                                                                 //root : 'root'
                                                             },

@@ -144,9 +144,10 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                         Ext.getCmp('form-dat-personales').getForm().reset();
                                     }
                                     
-                                    
-                                    
                                 }
+                                
+                                Ext.getCmp('button-grabar').setDisabled( false );
+                                
                             }
                         }
                     },
@@ -165,7 +166,9 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                             items: [
                                 { 
                                     xtype: 'button', 
+                                    id : 'button-grabar',
                                     text: 'Grabar',
+                                    disabled : true,
                                     handler: function() {
                                             var formDetCuenta = Ext.getCmp('form-det-cuenta').getForm();
                                             
@@ -178,9 +181,19 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                                 formDatPersonales.updateRecord();
                                                 
                                                 
-                                                formDetCuenta.getRecord( ).save();
                                                 
-                                                formDatPersonales.getRecord( ).save();
+                                                
+                                                formDetCuenta.getRecord( ).save();formDetCuenta.getRecord( ).commit();
+                                                formDatPersonales.getRecord( ).save();formDatPersonales.getRecord( ).commit();
+                                                
+                                                
+                                                
+                                                Ext.getCmp('grid-lista-usuario').getStore().reload( );
+                                                
+                                                
+                                                Ext.Msg.alert('Alerta','Transacción exitosa');
+                                                
+                                                this.setDisabled( true );
                                                 
                                             }
                                     }
@@ -190,8 +203,20 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                     text: 'Nuevo',
                                     handler: function() {
                                         Ext.getCmp('form-det-cuenta').getForm().reset();
+                                        Ext.getCmp('form-dat-personales').getForm().reset();
+                                        
                                         Ext.getCmp('admin-user-codigo').hide();
                                         Ext.getCmp('admin-user-usuario').focus();
+                                        
+                                        var recordUsuario = Ext.create('Usuarios', {} );
+                                        var recordPersona = Ext.create('Personas', {} );
+                                        Ext.getCmp('form-det-cuenta').loadRecord(recordUsuario);
+                                        Ext.getCmp('form-dat-personales').loadRecord(recordPersona);
+                                        
+                                        Ext.getCmp('button-grabar').setDisabled( false );
+                                        
+                                        
+                                        
                                     }
                                 }
                             ]
@@ -206,7 +231,7 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                 bodyPadding: 5,
 
                                 // The form will submit an AJAX request to this URL when submitted
-                                url: 'save-form.php',
+                                //url: 'save-form.php',
 
                                 // Fields will be arranged vertically, stretched to full width
                                 //layout: 'anchor',
@@ -214,7 +239,8 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                     //anchor: '100%'
                                     width: 240,
                                     labelWidth: 90,
-                                    msgTarget: 'side'
+                                    msgTarget: 'side',
+                                    allowBlank : false
                                 },
 
                                 // The fields
@@ -305,7 +331,7 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                 bodyPadding: 5,
 
                                 // The form will submit an AJAX request to this URL when submitted
-                                url: 'save-form.php',
+                                //url: 'save-form.php',
 
                                 // Fields will be arranged vertically, stretched to full width
                                 //layout: 'anchor',
@@ -313,7 +339,8 @@ Ext.define('MyDesktop.users.ManagementUsers', {
                                     //anchor: '100%'
                                     width: 240,
                                     labelWidth: 90,
-                                    msgTarget: 'side'
+                                    msgTarget: 'side',
+                                    allowBlank : false
                                 },
 
                                 // The fields

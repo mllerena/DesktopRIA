@@ -70,7 +70,7 @@ public class Usuarios implements Serializable {
     @Column(name = "CLAVE")
     private String clave;
     
-    @JoinColumn(name = "PERSONA", referencedColumnName = "CODIGO")
+    @JoinColumn(name = "PERSONA", referencedColumnName = "CODIGO",nullable = true)
     @ManyToOne
     private Personas persona;
 	
